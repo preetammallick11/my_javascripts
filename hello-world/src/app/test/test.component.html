@@ -1,0 +1,146 @@
+<form [formGroup]="myform" (ngSubmit)="myform.valid && onSubmit()">
+    Add user
+    <div>
+        <input type="text" placeholder="name" formControlName="userName" />
+        <small *ngIf="myform.get('userName').touched && myform.get('userName').errors?.required">Name is requried</small>
+    </div>
+    <div>
+        <input type="email" placeholder="email" formControlName="userEmail"/>
+        <small *ngIf="myform.get('userEmail').touched && myform.get('userEmail').errors?.required">Email is requried</small>
+        <small *ngIf="myform.get('userEmail').touched && myform.get('userEmail').errors?.email">Invalid email</small>
+    </div>
+    <button type="submit" [disabled]="!myform.valid">Submit</button>
+</form>
+<br><br>
+<form (ngSubmit)="updateUser()" *ngIf="isEdit">
+  Update user
+  <div>
+      <input type="text" name="user_name" [(ngModel)]="editUserDetails.userName" />
+  </div>
+  <div>
+      <input type="email" name="user_email" [(ngModel)]="editUserDetails.userEmail"/>
+  </div>
+  <button type="submit">Update</button>
+</form>
+
+<!-- <table class="table table-bordered" *ngIf="userLoaded">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of userList.data">
+      <td style="text-align: center;">{{user._id}}</td>
+      <td style="text-align: center;">{{user.userName}}</td>
+      <td style="text-align: center;">{{user.userEmail}}</td>
+    </tr>
+  </tbody>
+</table> -->
+
+<!-- ******************************** fetched data from mongo db ******************************* -->
+
+<table mat-table [dataSource]="userList.data" class="mat-elevation-z8" *ngIf="userLoaded">
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef> ID. </th>
+    <td mat-cell *matCellDef="let element"> {{element._id}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef> Name </th>
+    <td mat-cell *matCellDef="let element"> {{element.userName}} </td>
+  </ng-container>
+
+  <!-- Email Column -->
+  <ng-container matColumnDef="useremail">
+    <th mat-header-cell *matHeaderCellDef> Email </th>
+    <td mat-cell *matCellDef="let element"> {{element.userEmail}} </td>
+  </ng-container>
+
+  <!-- Action Column -->
+  <ng-container matColumnDef="action">
+    <th mat-header-cell *matHeaderCellDef> Action </th>
+    <td mat-cell *matCellDef="let element"> <button mat-button color="primary" (click)="editUser(element)">Edit</button> &nbsp; <button mat-button color="accent" (click)="deleteUser($event, element)">Delete</button></td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+</table>
+
+<!--  ***********************************************************************  -->
+
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource">
+  
+      <!-- Position Column -->
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef> No. </th>
+        <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+      </ng-container>
+  
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+  
+      <!-- Weight Column -->
+      <ng-container matColumnDef="weight">
+        <th mat-header-cell *matHeaderCellDef> Weight </th>
+        <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
+      </ng-container>
+  
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef> Symbol </th>
+        <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
+  
+  <button mat-raised-button (click)="isLinear = !isLinear" id="toggle-linear">
+    {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
+  </button>
+  <mat-horizontal-stepper [linear]="isLinear" #stepper>
+    <mat-step [stepControl]="firstFormGroup">
+      <form [formGroup]="firstFormGroup">
+        <ng-template matStepLabel>Fill out your name</ng-template>
+        <mat-form-field>
+          <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step [stepControl]="secondFormGroup">
+      <form [formGroup]="secondFormGroup">
+        <ng-template matStepLabel>Fill out your address</ng-template>
+        <mat-form-field>
+          <input matInput placeholder="Address" formControlName="secondCtrl" required>
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Done</ng-template>
+      You are now done.
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button (click)="stepper.reset()">Reset</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
